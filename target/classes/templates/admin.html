@@ -1,0 +1,116 @@
+<html  xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>dati</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+
+
+</head>
+<body>
+<style>
+
+    .navbar{
+        background: #d2edf4;
+        background-image: linear-gradient(to bottom, #f5807d, #e1e5f0 100%);
+    }
+</style>
+
+<script src="/js/common.js"></script>
+<div class="container" id="app" style="max-width: 1000px" >
+    <form id="searchForm" class="form-inline" onsubmit="return false">
+        <select class="form-control" id="type" v-on:change="sort()">
+            <option value="">不限类别</option>
+            <option v-bind:value="type.typeName" v-for="(type, i) in typeList">{{type.typeName}}</option>
+        </select>
+    </form>
+    <div class="post">
+        <table class="table table-hover">
+            <tr>
+                <td>订单号</td>
+                <td>客户</td>
+                <td>下单时间</td>
+                <td>宠物名称</td>
+                <td>作者</td>
+                <td>价钱</td>
+                <td>收件人</td>
+                <td>手机号码</td>
+                <td>收货地址</td>
+                <td>状态</td>
+                <td>操作</td>
+            </tr>
+            <tr v-for="(item, i) in items" class="text-center">
+                <td>{{item.billID}}</td>
+                <td>{{item.userName}}</td>
+                <td>{{item.billTime}}</td>
+                <td>{{item.freshName}}</td>
+                <td>{{item.freshSize}}</td>
+                <td>{{item.freshPrice}}</td>
+                <td>{{item.receiver}}</td>
+                <td>{{item.phone}}</td>
+                <td>{{item.address}}</td>
+                <td>{{item.billState}}</td>
+                <td>
+                    <button type="button" class="btn btn-success" v-if="item.billState=='已付款'" v-on:click="send(item.billID);">发货</button>
+                    <button type="button" class="btn btn-success" v-if="item.billState=='已发货'" v-on:click="editLogistics(item.billID,item.logistics,item.logisticsID,item.company);">更新物流详细</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!--  </div>-->
+</div>
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            picked: '',
+            typeList: [],
+            items: [],
+        },
+        methods: {
+            send: function (billID) {
+                window.location.href='/toAddLogistics?billID='+billID;
+            },
+            editLogistics: function (billID,logistics,logisticsID,company) {
+                window.location.href='/toEditLogistics?billID='+billID+"&logistics="+logistics+"&logisticsID="+logisticsID+"&company="+company;
+            },
+            sort:function () {
+                var type=$('#type').val();
+                var params={
+                    type:type,
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/showBillListByAdmin",
+                    data : params,
+                    success : function(data) {
+                        app.items=data.billList;
+                    }
+                });
+            },
+        }
+    });
+    $(document).ready(function(){
+        var params1=[]
+        $.ajax({
+            type : "post",
+            url : "/user/showBillListByAdmin",
+            data : params1,
+            success : function(data) {
+                app.items=data.billList;
+            }
+        });
+        $.ajax({
+            type : "post",
+            url : "/user/showTypeList",
+            data : params1,
+            success : function(data) {
+                app.typeList=data.typeList;
+            }
+        });
+    })
+</script>
+</body>
+</html>

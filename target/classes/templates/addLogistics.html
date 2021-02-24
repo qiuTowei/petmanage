@@ -1,0 +1,80 @@
+<html  xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+       xmlns:v="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>dati</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+
+    <script src="/js/common.js"></script>
+</head>
+<body>
+<style>
+    .container{
+        max-width: 1000px;
+        background-color: transparent;
+        min-height: 100%;
+    }
+
+</style>
+
+<script src="/js/common.js"></script>
+<div class="container" id="app" >
+    <div class="post" >
+    <div class="form-group">
+        <label >快递单号：</label>
+        <input  class="form-control" name="userName"  type="text" v-model="logisticsID"  required placeholder="快递单号"/>
+    </div>
+    <div class="form-group">
+        <label >快递公司：</label>
+        <input  class="form-control" name="userName"  type="text" v-model="company"  required placeholder="快递公司"/>
+    </div>
+    <div class="form-group">
+        <label >物流详情：</label>
+        <input  class="form-control" name="userName"  type="text" v-model="logistics"  required placeholder="快递详情"/>
+    </div>
+    <div class="form-group"> <button  class="btn btn-primary  btn-block" v-on:click="send()">发货</button></div>
+    </div>
+</div>
+<script th:inline="javascript">
+    var billID=[[${billID}]];
+    var app = new Vue({
+        el: '#app',
+        data: {
+            logisticsID: '',
+            company: '',
+            logistics: '',
+            items:[],
+        },
+        methods: {
+            send: function () {
+                var data = {
+                    logisticsID:app.logisticsID,
+                    company:app.company,
+                    logistics:app.logistics,
+                    billID:billID,
+                };
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    url: "/user/send",
+                    data: data,
+                    error: function (request) {
+                        alert("连接错误")
+                    },
+                    success: function (data) {
+                        if (data.code == 200) {
+                            alert("发货成功")
+                            location.href="/admin"
+                        }
+                    }
+                })
+            },
+        }
+    });
+
+
+</script>
+</body>
+</html>

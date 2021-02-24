@@ -1,0 +1,86 @@
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>dati</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+
+
+
+    <script src="/js/common.js"></script>
+</head>
+<body>
+<style>
+    .container{
+        background-color: transparent;
+    }
+</style>
+<div class="container" id="app" >
+
+    <div class="post">
+        <table class="table table-hover">
+            <tr>
+                <td>用户名</td>
+                <td>评价内容</td>
+                <td>评价时间</td>
+                <td>操作</td>
+            </tr>
+            <tr v-for="(item, i) in items">
+                <td>{{item.userName}}</td>
+                <td>{{item.content}}</td>
+                <td>{{item.time}}</td>
+                <td>
+                    <button type="button" class="btn btn-danger"  v-on:click="deleteComment(item.commentID)">删除</button>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+</div>
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            items: [
+            ]
+        },
+        methods: {
+            deleteComment:function (commentID) {
+                var params={
+                    commentID:commentID
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/deleteComment",
+                    data : params,
+                    success : function(data) {
+                        if(data.code==200){
+                            alert("删除成功");
+                            location.reload();
+                        }
+                        else {
+                            alert("连接错误");
+                        }
+                    }
+                });
+            },
+        }
+    });
+    $(document).ready(function(){
+        var params1={
+            pageNum:1,
+            pageSize:4,
+        }
+        $.ajax({
+            type : "post",
+            url : "/user/showCommentList",
+            data : params1,
+            success : function(data) {
+                app.items=data.commentList;
+            }
+        });
+    })
+</script>
+</body>
+</html>

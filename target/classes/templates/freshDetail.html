@@ -1,0 +1,150 @@
+<html  xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+       xmlns:v="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>dati</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <script src="/js/common.js"></script>
+    <link href="/css/templatemo_style.css" rel="stylesheet" type="text/css" />
+
+    <link rel="stylesheet" href="/css/orman.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/css/nivo-slider.css" type="text/css" media="screen" />
+
+    <link rel="stylesheet" type="text/css" href="/css/ddsmoothmenu.css" />
+</head>
+<body id="body">
+<style>
+    #class td {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    body{
+
+    }
+    .container{
+        background-color: transparent;
+    }
+</style>
+<div class="container" id="app" style="max-width: 730px">
+
+    <div class="post">
+        <div id="content"style="width: 700px">
+            <h2>宠物详情</h2>
+            <div class="content_half left">
+                <a rel="lightbox" href="##"><img v-bind:src="url" alt="yellow flowers" style="width: 128px;height: 128px"></a>
+            </div>
+            <div class="content_half right">
+                <table>
+                    <tbody>
+                    <tr>
+                        <td width="130">名称:</td>
+                        <td width="84">{{freshName}}</td>
+                    </tr>
+                    <tr>
+                        <td width="130">作者:</td>
+                        <td width="84">{{freshSize}}</td>
+                    </tr>
+                    <tr>
+                        <td width="130">分类:</td>
+                        <td width="84">{{type}}</td>
+                    </tr>
+                    <tr>
+                        <td>价格:</td>
+                        <td><strong>{{freshPrice}}</strong></td>
+                    </tr>
+                    </tbody></table>
+                <div class="cleaner h20"></div>
+                <a href="##" class="button" v-on:click="addCar(freshID)">加入购物车</a>
+            </div>
+            <div class="cleaner h40"></div>
+            <h4>详细描述</h4>
+            <p>{{freshDetail}}</p>
+            <div class="cleaner h40"></div>
+            <div class="blank_box">
+            </div>
+        </div>
+        <table class="table table-hover">
+            <tr>
+                <td>用户</td>
+                <td>评价内容</td>
+                <td>评价时间</td>
+            </tr>
+            <tr v-for="(item, i) in items">
+                <td>{{item.userName}}</td>
+                <td>{{item.content}}</td>
+                <td>{{item.time}}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+<script th:inline="javascript">
+    var freshID=[[${freshID}]];
+    var app = new Vue({
+        el: '#app',
+        data: {
+            freshID: '',
+            freshPrice: '',
+            freshName:'',
+            freshDetail:'',
+            freshSize:'',
+            type:'',
+            url:'',
+            items:[],
+        },
+        methods: {
+            addCar:function (freshID) {
+                var params={
+                    freshID:freshID
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/addCar",
+                    data : params,
+                    success : function(data) {
+                        if(data.code==200){
+                            alert("添加成功");
+                        }
+                        else if(data.code==404){
+                            alert("未登录");
+                            top.document.location.href="/";
+                        }
+                        else {
+                            alert("连接错误");
+                        }
+                    }
+                });
+            },
+        }
+    });
+    $(document).ready(function(){
+        var params={
+            freshID:freshID
+        };
+        $.ajax({
+            type : "post",
+            url : "/user/showFreshDetail",
+            data : params,
+            success : function(data) {
+                app.freshPrice=data.fresh.freshPrice;
+                app.freshName=data.fresh.freshName;
+                app.freshID=data.fresh.freshID;
+                app.freshDetail=data.fresh.freshDetail;
+                app.type=data.fresh.type;
+                app.url=data.fresh.url;
+                app.freshSize=data.fresh.freshSize;
+            }
+        });
+        $.ajax({
+            type : "post",
+            url : "/user/showCommentListByFresh",
+            data : params,
+            success : function(data) {
+                app.items=data.commentList;
+            }
+        });
+    })
+</script>
+</body>
+</html>

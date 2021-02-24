@@ -1,0 +1,132 @@
+<html  xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>dati</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+
+
+</head>
+<body>
+<style>
+
+
+
+    .container{
+        max-width: 1000px;
+        min-height: 100%;
+        background-color: transparent;
+    }
+</style>
+<script src="/js/common.js"></script>
+<div class="container" id="app" >
+
+    <div class="post">
+        <div class="form-group">
+            <label>名称</label>
+            <input type="text" class="form-control" name="score" v-model="freshName">
+        </div>
+        <div class="form-group">
+            <label>作者</label>
+            <input type="text" class="form-control" name="score" v-model="freshSize">
+        </div>
+        <div class="form-group">
+            <label>价格</label>
+            <input type="text" class="form-control" name="score" v-model="freshPrice">
+        </div>
+        <div class="form-group">
+            <label>图片链接</label>
+            <input type="text" class="form-control" name="score" v-model="url">
+        </div>
+        <div class="form-group">
+            <label>分类</label>
+            <select class="form-control" v-model="type">
+                <option v-for="(item, i) in items" v-bind:value="item.typeName">{{item.typeName}}</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>详情介绍</label>
+            <textarea  class="form-control" name="score" v-model="freshDetail"  style="resize:none" rows="7"></textarea>
+        </div>
+        <button  class="btn btn-primary  btn-block" v-on:click="editFresh()">修改</button>
+    </div>
+</div>
+<script th:inline="javascript">
+    var freshID=[[${freshID}]];
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            freshName: '',
+            freshSize:  '',
+            freshPrice: '',
+            url:  '',
+            type:  '',
+            freshDetail: '',
+            items: [],
+        },
+        methods: {
+            editFresh:function () {
+                var params={
+                    freshName:app.freshName,
+                    freshSize:app.freshSize,
+                    freshPrice:app.freshPrice,
+                    url:app.url,
+                    type:app.type,
+                    freshID:freshID,
+                    freshDetail:app.freshDetail
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/editFresh",
+                    data : params,
+                    success : function(data) {
+                        if(data.code==200){
+                            alert("修改成功");
+                        }
+                        else if(data.code==404){
+                            alert("失败");
+                        }
+                        else {
+                            alert("连接错误");
+                        }
+                        location.href="/toFreshList";
+                    }
+                });
+            }
+        }
+    });
+    created();
+    function created() {
+        var params={
+        };
+        var params1={
+            freshID:freshID
+        };
+        $.ajax({
+            type : "post",
+            url : "/user/showTypeList",
+            data : params,
+            success : function(data) {
+                app.items=data.typeList;
+            }
+        });
+        $.ajax({
+            type : "post",
+            url : "/user/showFreshDetail",
+            data : params1,
+            success : function(data) {
+                app.freshName=data.fresh.freshName;
+                app.freshSize=data.fresh.freshSize;
+                app.freshPrice=data.fresh.freshPrice;
+                app.freshDetail=data.fresh.freshDetail;
+                app.type=data.fresh.type;
+                app.url=data.fresh.url;
+            }
+        });
+    }
+</script>
+</body>
+</html>

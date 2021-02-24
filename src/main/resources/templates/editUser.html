@@ -1,0 +1,114 @@
+<html  xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>dati</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+</head>
+<body>
+<style>
+    .container{
+        max-width: 1000px;
+        min-height: 100%;
+        background-color: transparent;
+    }
+</style>
+
+
+<script src="/js/common.js"></script>
+
+<div class="container" id="app" >
+
+    <div class="post">
+        <div class="form-group">
+            <label>用户名</label>
+            <input type="text" class="form-control" name="1" v-model="userName" v-bind:value="userName" required placeholder="用户名">
+        </div>
+        <div class="form-group">
+            <label>密码</label>
+            <input type="text" class="form-control"  name="1" v-model="password" v-bind:value="password">
+        </div>
+        <div class="form-group">
+            <label>收货地址</label>
+            <input type="text" class="form-control" name="1" v-model="address" v-bind:value="address">
+        </div>
+        <div class="form-group">
+            <label>收货人</label>
+            <input type="text" class="form-control" name="1" v-model="receiver" v-bind:value="receiver" required placeholder="收货人">
+        </div>
+        <div class="form-group">
+            <label>手机号码</label>
+            <input type="text" class="form-control" name="1" v-model="phone" th:value="${phone}">
+        </div>
+        <button  class="btn btn-primary  btn-block" v-on:click="editFresh()">修改</button>
+    </div>
+
+</div>
+<script th:inline="javascript">
+    var userName=[[${userName}]];
+    var password=[[${password}]];
+    var address=[[${address}]];
+    var receiver=[[${receiver}]];
+    var phone=[[${phone}]];
+    var userID=[[${userID}]];
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            userName: [[${userName}]],
+            password: password,
+            address:address,
+            receiver: receiver,
+            phone: [[${phone}]],
+        },
+        methods: {
+            editFresh:function () {
+                var params={
+                    userName:app.userName,
+                    password:app.password,
+                    address:app.address,
+                    receiver:app.receiver,
+                    phone:app.phone,
+                    userID:userID
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/editFresh",
+                    data : params,
+                    success : function(data) {
+                        if(data.code==200){
+                            alert("修改成功");
+                        }
+                        else if(data.code==404){
+                            alert("失败");
+                        }
+                        else {
+                            alert("连接错误");
+                        }
+                        location.href="/toFreshList";
+                    }
+                });
+            }
+        }
+    });
+    function searchWithCondition() {
+        var input=$('#bookInput').val();
+        var type=$("input[name='type']:checked").val();;
+        var params={
+            input:input,
+            type:type
+        };
+        $.ajax({
+            type : "post",
+            url : "/user/getUsers",
+            data : params,
+            success : function(data) {
+                app.items=data;
+            }
+        });
+    }
+</script>
+</body>
+</html>

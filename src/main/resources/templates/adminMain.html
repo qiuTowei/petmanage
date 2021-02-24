@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>Title</title>
+    <script src="/js/common.js"></script>
+</head>
+<style>
+
+    .navbar{
+        background: #d2edf4;
+        background-image: linear-gradient(to bottom, #f59836, #e1e5f0 100%);
+        margin-bottom: 0px;
+    }
+</style>
+<!--头部导航栏-->
+<body style="background-image: none">
+<nav class="navbar navbar-default" id="app1">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-5" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">宠物管理系统</a>
+        </div>
+
+        <div class="collapse navbar-collapse">
+            <p class="navbar-text navbar-right"> <a href="javascript:location.href='/'">退出
+            </a></p>
+           <!-- <p class="navbar-text navbar-right"> <a href="##" v-bind:class="menu.toCommentList" onclick="toCommentList()">留言管理
+            </a></p>-->
+            <!--<p class="navbar-text navbar-right"> <a href="##" v-bind:class="menu.toUserList" onclick="toUserList()">用户管理
+            </a></p>-->
+            <p class="navbar-text navbar-right"> <a href="##" v-bind:class="menu.toType" onclick="toType()">分类管理
+            </a></p>
+            <p class="navbar-text navbar-right"> <a href="##" v-bind:class="menu.toFreshList" onclick="toFreshList()">宠物管理
+            </a></p>
+            <p class="navbar-text navbar-right"> <a href="##" v-bind:class="menu.admin" onclick="admin()">订单管理
+            </a></p>
+
+            <p class="navbar-text navbar-right"> <a href="##" v-bind:class="menu.admin" onclick="toOrderList()">账单管理
+            </a></p>
+
+        </div>
+    </div>
+</nav>
+<!--主体-->
+<iframe src="/admin" width="100%" height="700px" frameborder="0" name="voiceList" scrolling="no" id="iframe"></iframe>
+</body>
+
+<script>
+
+    var app = new Vue({
+        el: '#app1',
+        data: {
+            menu:{
+                toFreshList:'',
+                toOrderList:'',
+                admin:'choose',
+                toType:'',
+                toCommentList:'',
+            },
+            choose:'choose'
+        },
+        methods: {
+        }
+    });
+    function toCommentList() {
+        renew();
+        app.menu.toCommentList=app.choose;
+        $("iframe").attr("src","/toCommentList");
+    }
+    function toUserList() {
+        renew();
+        app.menu.toUserList=app.choose;
+        $("iframe").attr("src","/toUserList");
+    }
+    function toFreshList() {
+        renew();
+        app.menu.toFreshList=app.choose;
+        $("iframe").attr("src","/toFreshList");
+    }
+    function toOrderList() {
+        renew();
+        app.menu.toOrderList=app.choose;
+        $("iframe").attr("src","/toOrderList");
+    }
+    function toType() {
+        renew();
+        app.menu.toType=app.choose;
+        $("iframe").attr("src","/toType");
+    }
+    function admin() {
+        renew();
+        app.menu.admin=app.choose;
+        $("iframe").attr("src","/admin");
+    }
+    function renew(){
+        app.menu={
+            toFreshList:'',
+            admin:'',
+            toType:'',
+            toCommentList:'',
+        };
+    }
+</script>
+</html>

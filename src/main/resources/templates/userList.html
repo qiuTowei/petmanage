@@ -1,0 +1,185 @@
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>dati</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+
+
+
+    <script src="/js/common.js"></script>
+</head>
+<body>
+<style>
+    .navbar{
+        background: #d2edf4;
+        background-image: linear-gradient(to bottom, #d0edf5, #e1e5f0 100%);
+    }
+    .container{
+        background-color: transparent;
+    }
+    .form-group{
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+</style>
+<div class="container" id="app" style="max-width: 1000px">
+
+    <div class="post">
+        <table class="table table-hover">
+            <tr>
+                <td>用户编号</td>
+                <td>账号</td>
+                <td>密码</td>
+                <td>收货地址</td>
+                <td>收货人</td>
+                <td>手机号码</td>
+                <td>操作</td>
+            </tr>
+            <tr v-for="(item, i) in items">
+                <td>{{item.userID}}</td>
+                <td>{{item.userName}}</td>
+                <td>{{item.password}}</td>
+                <td>{{item.address}}</td>
+                <td>{{item.receiver}}</td>
+                <td>{{item.phone}}</td>
+                <td>
+                    <button type="button" class="btn btn-danger"  v-on:click="deleteUser(item.userID)">删除</button>
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal"  v-on:click="showEdit(item.userID,item.userName,item.password,item.address,item.receiver,item.phone)">修改</button>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+    <!-- 模态框（Modal） -->
+    <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">修改用户信息</h4>
+                </div>
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" class="form-control" name="1" v-model="userName" v-bind:value="userName" required placeholder="用户名">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="text" class="form-control"  name="1" v-model="password" v-bind:value="password">
+                </div>
+                <div class="form-group">
+                    <label>收货地址</label>
+                    <input type="text" class="form-control" name="1" v-model="address" v-bind:value="address">
+                </div>
+                <div class="form-group">
+                    <label>收货人</label>
+                    <input type="text" class="form-control" name="1" v-model="receiver" v-bind:value="receiver" required placeholder="收货人">
+                </div>
+                <div class="form-group">
+                    <label>手机号码</label>
+                    <input type="text" class="form-control" name="1" v-model="phone"  v-bind:value="phone">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" v-on:click="editUser()">提交更改</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+</div>
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            userID:'',
+            userName:'',
+            password:'',
+            address:'',
+            receiver: '',
+            phone: '',
+            items: [
+            ]
+        },
+        methods: {
+            deleteUser:function (userID) {
+                var params={
+                    userID:userID
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/deleteUser",
+                    data : params,
+                    success : function(data) {
+                        if(data.code==200){
+                            alert("删除成功");
+                            location.reload();
+                        }
+                        else {
+                            alert("连接错误");
+                        }
+                    }
+                });
+            },
+            showEdit:function (userID,userName,password,address,receiver,phone) {
+                        app.userName=userName,
+                        app.password=password,
+                        app.address=address,
+                        app.receiver=receiver,
+                        app.phone=phone,
+                        app.userID=userID
+            },
+            editUser:function () {
+                if (!app.phone.match('^1(3|4|5|7|8)\\d{9}$')) {
+                    alert("手机号码格式不正确");
+                    return false;
+                }
+                if (app.password==""){
+                    alert("密码不能为空");
+                    return false;
+                }
+                var params={
+                    userName:app.userName,
+                    password:app.password,
+                    address:app.address,
+                    receiver:app.receiver,
+                    phone:app.phone,
+                    userID:app.userID
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/updateUserInfo",
+                    data : params,
+                    success : function(data) {
+                        if(data.code==200){
+                            alert("修改成功");
+                        }
+                        else if(data.code==404){
+                            alert("失败");
+                        }
+                        else {
+                            alert("连接错误");
+                        }
+                        location.reload();
+                    }
+                });
+            }
+        }
+    });
+    $(document).ready(function(){
+        var params1={
+            pageNum:1,
+            pageSize:4,
+        }
+        $.ajax({
+            type : "post",
+            url : "/user/showUserList",
+            data : params1,
+            success : function(data) {
+                app.items=data.userList;
+            }
+        });
+    })
+</script>
+</body>
+</html>

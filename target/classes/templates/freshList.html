@@ -1,0 +1,209 @@
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>dati</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+
+
+
+    <script src="/js/common.js"></script>
+</head>
+<body>
+<style>
+
+    .container{
+        background-color: transparent;
+    }
+    #class td {
+        vertical-align: middle;
+        text-align: center;
+    }
+</style>
+<div class="container" id="app" style="max-width: 1000px">
+
+    <form id="searchForm" class="form-inline" onsubmit="return false">
+        <input id="bookInput" class="form-control" placeholder="输入要查询的宠物名称" v-model="freshName">
+        <a class="btn btn-info"  href="#" v-on:click="search()">查询</a>
+        <select class="form-control" id="type" v-on:change="sort()">
+            <option value="">不限类别</option>
+            <option v-bind:value="type.typeName" v-for="(type, i) in typeList">{{type.typeName}}</option>
+        </select>
+    </form>
+    <div class="post">
+        <div id="class">
+        <table class="table table-hover">
+            <tr>
+                <td>名称</td>
+                <td>图片</td>
+                <td>分类</td>
+                <td>作者</td>
+                <td>价格</td>
+                <td>购买</td>
+            </tr>
+            <tr v-for="(item, i) in items">
+                <td>{{item.freshName}}</td>
+                <td><img v-bind:src="item.url" style="width: 96px;height: 96px"></td>
+                <td>{{item.type}}</td>
+                <td>{{item.freshSize}}</td>
+                <td>{{item.freshPrice}}</td>
+                <td>
+                    <button type="button" class="btn btn-danger"  v-on:click="deleteFresh(item.freshID)">删除</button>
+                    <button type="button" class="btn btn-success"  v-on:click="editFresh(item.freshID,item.freshName,item.url,item.type,item.freshSize,item.freshPrice,item.freshDetail)">修改</button>
+                </td>
+            </tr>
+        </table>
+        </div>
+        <button  class="btn btn-primary  btn-block" onclick="javascript:location.href='/toAddFresh'">新增</button>
+
+    </div>
+
+    <!--  </div>-->
+    <footer class="skill-ftw">
+        <ul class="fixed-skill-ftw" style="padding-left: 0px;">
+            <li class="skill-ftw-li" v-if="!isFirstPage">
+                <a v-on:click="page(prePage)" href="##">
+                    <span class="glyphicon glyphicon-chevron-left" style="color: rgb(33, 150, 243); font-size: 1.5em;">上一页</span>
+                </a>
+            </li>
+            <li class="skill-ftw-li" v-if="!isLastPage">
+                <a v-on:click="page(nextPage)" href="##">
+                    <span class="skill-ftw-item brand-goods ">
+                        <span class="glyphicon glyphicon-chevron-right" style="color: rgb(33, 150, 243); font-size: 1.5em;">下一页</span>
+                    </span>
+                </a>
+            </li>
+        </ul>
+    </footer>
+</div>
+<script>
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            picked: '',
+            freshName:'',
+            nextPage:1,
+            prePage:1,
+            pageSize:4,
+            isLastPage:true,
+            isFirstPage:true,
+            type:'',
+            items: [
+            ],
+            typeList: [
+            ],
+        },
+        methods: {
+            deleteFresh:function (freshID) {
+                var params={
+                    freshID:freshID
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/deleteFresh",
+                    data : params,
+                    success : function(data) {
+                        if(data.code==200){
+                            alert("删除成功");
+                            location.reload();
+                        }
+                        else {
+                            alert("连接错误");
+                        }
+                    }
+                });
+            },
+            search:function () {
+                var type=$('#type').val();
+                var params={
+                    freshName:app.freshName,
+                    type:type,
+                    pageNum:1,
+                    pageSize:4,
+                    isLastPage:true,
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/showFreshList",
+                    data : params,
+                    success : function(data) {
+                        app.items=data.pageInfo.list;
+                        app.nextPage=data.pageInfo.nextPage;
+                        app.prePage=data.pageInfo.prePage;
+                        app.isLastPage=data.pageInfo.isLastPage;
+                        app.isFirstPage=data.pageInfo.isFirstPage;
+                    }
+                });
+            },
+            sort:function () {
+                var type=$('#type').val();
+                var params={
+                    freshName:app.freshName,
+                    type:type,
+                    pageNum:1,
+                    pageSize:4,
+                    isLastPage:true,
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/showFreshList",
+                    data : params,
+                    success : function(data) {
+                        app.items=data.pageInfo.list;
+                        app.nextPage=data.pageInfo.nextPage;
+                        app.prePage=data.pageInfo.prePage;
+                        app.isLastPage=data.pageInfo.isLastPage;
+                        app.isFirstPage=data.pageInfo.isFirstPage;
+                    }
+                });
+            },
+            page: function (nextPage) {
+                var type=$('#type').val();
+                var params={
+                    pageNum:nextPage,
+                    pageSize:4,
+                    isLastPage:true,
+                    type:type,
+                    freshName:app.freshName
+                }
+                $.ajax({
+                    type : "post",
+                    url : "/user/showFreshList",
+                    data:params,
+                    success : function(data) {
+                        app.items=data.pageInfo.list;
+                        app.nextPage=data.pageInfo.nextPage;
+                        app.prePage=data.pageInfo.prePage;
+                        app.isLastPage=data.pageInfo.isLastPage;
+                        app.isFirstPage=data.pageInfo.isFirstPage;
+                    },
+                });
+            },
+            editFresh:function (freshID,freshName,url,type,freshSize,freshPrice,freshDetail) {
+                location.href="toEditFresh?freshID="+freshID+"&freshName="+freshName+"&url="+url+"&type="+type+"&freshSize="+freshSize+"&freshPrice="+freshPrice+"&freshDetail="+freshDetail;
+            }
+        }
+    });
+    $(document).ready(function(){
+        var params1={
+            pageNum:1,
+            pageSize:4,
+        }
+        $.ajax({
+            type : "post",
+            url : "/user/showFreshList",
+            data : params1,
+            success : function(data) {
+                app.items=data.pageInfo.list;
+                app.nextPage=data.pageInfo.nextPage;
+                app.prePage=data.pageInfo.prePage;
+                app.isLastPage=data.pageInfo.isLastPage;
+                app.isFirstPage=data.pageInfo.isFirstPage;
+                app.typeList=data.typeList;
+            }
+        });
+    })
+</script>
+</body>
+</html>

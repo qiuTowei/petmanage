@@ -1,0 +1,120 @@
+<html  xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0"/>
+    <title>dati</title>
+
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+
+
+</head>
+<body>
+<style>
+    .navbar{
+        background: #d2edf4;
+        background-image: linear-gradient(to bottom, #d0edf5, #e1e5f0 100%);
+    }
+    .container{
+        max-width: 1000px;
+        min-height: 100%;
+        background-color: transparent;
+    }
+</style>
+
+<script src="/js/common.js"></script>
+<div class="container" id="app" >
+
+    <div class="post">
+        <div class="form-group">
+            <label>月账单名称</label>
+            <input type="text" class="form-control" name="score" v-model="orderName">
+        </div>
+
+        <div class="form-group">
+            <label>月账单总营收</label>
+            <input type="text" class="form-control" name="score" v-model="orderMoney">
+        </div>
+        <div class="form-group">
+            <label>选择月份</label>
+            <select class="form-control" v-model="month">
+                <!--<option v-for="(item, i) in items" v-bind:value="item.userID">{{item.userName}}</option>-->
+                <option value="1">一月</option>
+                <option value="2">二月</option>
+                <option value="3">三月</option>
+                <option value="4">四月</option>
+                <option value="5">五月</option>
+                <option value="6">六月</option>
+                <option value="7">七月</option>
+                <option value="8">八月</option>
+                <option value="9">九月</option>
+                <option value="10">十月</option>
+                <option value="11">十一月</option>
+                <option value="12">十二月</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>账单详情</label>
+            <textarea  class="form-control" name="score" v-model="remark"  style="resize:none" rows="7"></textarea>
+        </div>
+        <button  class="btn btn-primary  btn-block" v-on:click="insertOrder()">新增</button>
+    </div>
+
+    <!--  </div>-->
+</div>
+<script th:inline="javascript">
+    /*var courseID=[[${courseID}]];*/
+
+    var app = new Vue({
+        el: '#app',
+        data: {
+            orderName: '',
+            orderMoney: '',
+            remark: '',
+            month: '',
+            items:[]
+        },
+        methods: {
+            insertOrder:function () {
+                var params={
+                    orderName:app.orderName,
+                    orderMoney:app.orderMoney,
+                    remark:app.remark,
+                    month:app.month,
+                };
+                $.ajax({
+                    type : "post",
+                    url : "/user/insertOrder",
+                    data : params,
+                    success : function(data) {
+                        if(data.code==200){
+                            alert("新增成功");
+                        }
+                        else if(data.code==404){
+                            alert("失败");
+                        }
+                        else {
+                            alert("连接错误");
+                        }
+                        location.href="/toOrderList";
+                    }
+                });
+            }
+        }
+    });
+    created();
+    function created() {
+        var params={
+        };
+        $.ajax({
+            type : "post",
+            url : "/user/showUserList",
+            data : params,
+            success : function(data) {
+                app.items=data.userList;
+            }
+        });
+    }
+</script>
+</body>
+</html>
